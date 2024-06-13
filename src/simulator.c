@@ -56,49 +56,50 @@ status_t allocate_page(Process *process, addr_t address, addr_t physical_address
 
 
 status_t deallocate_page(Process *process, addr_t address) {
-  // 确保地址对齐
-  assert(address >> OFFSET_BITS << OFFSET_BITS == address);
+    // 确保地址对齐
+    assert((address >> OFFSET_BITS << OFFSET_BITS) == address);
 
-  // 检查进程是否有效
-  if (process == NULL) {
-    return ERROR;
-  }
+    // 检查进程是否有效
+    if (process == NULL) {
+        return ERROR;
+    }
 
-  // // 计算L1和L2页表索引
-  // unsigned int l1_index = address >> (OFFSET_BITS + L2_BITS);
-  // unsigned int l2_index = (address >> OFFSET_BITS) & ((1 << L2_BITS) - 1);
+    // 计算L1和L2页表索引
+    size_t l1_index = (address >> (OFFSET_BITS + L2_BITS)) & ((1 << L1_BITS) - 1);
+    size_t l2_index = (address >> OFFSET_BITS) & ((1 << L2_BITS) - 1);
 
-  // // 检查L1页表项是否存在
-  // if (process->page_table.entries[l1_index].entries == NULL) {
-  //   return ERROR;  // 如果L1页表项不存在，返回错误
-  // }
+    // 检查L1页表项是否存在
+    if (process->page_table.entries[l1_index].entries == NULL) {
+        return ERROR;  // 如果L1页表项不存在，返回错误
+    }
 
-  // // 获取L2页表项
-  // PTE *pte = &process->page_table.entries[l1_index].entries[l2_index];
+    // 获取L2页表项
+    PTE *pte = &process->page_table.entries[l1_index].entries[l2_index];
 
-  // // 检查L2页表项是否有效
-  // if (!pte->valid) {
-  //   return ERROR;  // 如果L2页表项无效，返回错误
-  // }
+    // 检查L2页表项是否有效
+    if (!pte->valid) {
+        return ERROR;  // 如果L2页表项无效，返回错误
+    }
 
-  // // 将页表项标记为无效
-  // pte->valid = 0;
-  // process->page_table.entries[l1_index].valid_count--;
+    // 将页表项标记为无效
+    pte->valid = 0;
+    process->page_table.entries[l1_index].valid_count--;
 
-  // // 更新物理内存状态
-  // main_memory->pages[pte->frame] = NULL;
+    // 更新物理内存状态
+    main_memory->pages[pte->frame] = NULL;
 
-  // // 如果L2页表中没有有效的页表项，则释放整个L2页表
-  // if (process->page_table.entries[l1_index].valid_count == 0) {
-  //   free(process->page_table.entries[l1_index].entries);
-  //   process->page_table.entries[l1_index].entries = NULL;
-  // }
+    // 如果L2页表中没有有效的页表项，则释放整个L2页表
+    if (process->page_table.entries[l1_index].valid_count == 0) {
+        free(process->page_table.entries[l1_index].entries);
+        process->page_table.entries[l1_index].entries = NULL;
+    }
 
-  // // 从TLB中移除相应的条目
-  // remove_TLB(process->pid, l2_index);
+    // 从TLB中移除相应的条目
+    remove_TLB(process->pid, address);
 
-  return SUCCESS;  // 释放成功
+    return SUCCESS;  // 释放成功
 }
+
 
 status_t read_byte(Process *process, addr_t address, byte_t *byte) {
   // 检查进程是否有效
