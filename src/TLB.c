@@ -34,7 +34,7 @@ unsigned read_TLB(proc_id_t pid, unsigned vpn) {
 
 void write_TLB(proc_id_t pid, unsigned vpn, unsigned ppn) {
   if(pid){
-    
+
   }
   int lru_index = -1;
   uint32_t min_lut = UINT32_MAX;
@@ -68,13 +68,14 @@ void write_TLB(proc_id_t pid, unsigned vpn, unsigned ppn) {
 }
 
 void remove_TLB(proc_id_t pid, unsigned vpn) {
-// 遍历TLB查找匹配的条目
-  for (int i = 0; i < TLB_SIZE; i++) {
-    if (global_tlb->entries[i].valid && global_tlb->entries[i].vpn == vpn && global_tlb->pid == pid) {
-    // 如果找到匹配的条目，将其标记为无效
-    global_tlb->entries[i].valid = 0;
-    // 可以选择重置其他字段，但在这个上下文中不是必需的
-    break;  // 找到后即退出循环
+    // 遍历TLB查找匹配的条目
+    for (int i = 0; i < TLB_SIZE; i++) {
+        if (global_tlb->entries[i].valid && global_tlb->entries[i].vpn == vpn ) {
+            // 如果找到匹配的条目，将其标记为无效
+            global_tlb->entries[i].valid = 0;
+            // 可以选择重置其他字段，但在这个上下文中不是必需的
+            break;  // 找到后即退出循环
+        }
     }
-  }
 }
+
