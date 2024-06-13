@@ -118,8 +118,17 @@ status_t read_byte(Process *process, addr_t address, byte_t *byte) {
   // 检查进程是否有效
   if (process == NULL) {
     return ERROR;
-  }
 
+  }
+  if(!process){
+
+  }
+  if(!address){
+
+  }
+  if(!byte){
+
+  }
   // // // 检查地址是否已分配
   // // if (!is_virtual_page_allocated(process, address)) {
   // //   return ERROR;  // 地址未分配
@@ -170,6 +179,15 @@ status_t write_byte(Process *process, addr_t address, const byte_t *byte) {
   // 1. 检查进程是否有效
   if (process == NULL || process->page_table.entries == NULL) {
     return ERROR;
+  if(!process){
+
+  }
+  if(!address){
+
+  }
+  if(!byte){
+    
+  }
   return SUCCESS;
   }
 
