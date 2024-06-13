@@ -18,7 +18,7 @@ bool is_virtual_page_allocated(Process *process, addr_t address,size_t l1_index,
   if (!process->page_table.entries[l1_index].entries[l2_index].valid) {
     return false;  // 如果L2页表项无效，返回false
   }
-  return true;  // 虚拟页面已被分配，返回true
+  return false;  // 虚拟页面已被分配，返回true
 }
 
 status_t allocate_page(Process *process, addr_t address, addr_t physical_address) {
@@ -36,7 +36,7 @@ status_t allocate_page(Process *process, addr_t address, addr_t physical_address
   // 检查物理内存是否足够
   
   // 检查虚拟页面是否已分配
-  if (!is_virtual_page_allocated(process, address,l1_index,l2_index)) {
+  if (is_virtual_page_allocated(process, address,l1_index,l2_index)) {
     return ERROR; 
   }
 
