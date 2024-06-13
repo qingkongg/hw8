@@ -14,7 +14,7 @@ bool is_physical_memory_available(addr_t physical_address) {
   }
   // 检查物理页是否已被分配
   if (main_memory->pages[ppn] != NULL) {
-    return false;  // 如果已被分配，返回false
+    return true;  // 如果已被分配，返回false
   }
   return true;  // 物理内存足够，返回true
 }
@@ -51,10 +51,8 @@ status_t allocate_page(Process *process, addr_t address, addr_t physical_address
   
   // 检查虚拟页面是否已分配
   if (is_virtual_page_allocated(process, address,l1_index,l2_index)) {
-    return ERROR;  // 如果虚拟页面已分配，返回错误
+    return ERROR; 
   }
-
-  // 在页表中创建映射
 
   // 检查L1页表项是否存在
   if (process->page_table.entries[l1_index].entries == NULL) {
