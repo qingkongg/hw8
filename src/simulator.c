@@ -22,6 +22,9 @@ bool is_physical_memory_available(addr_t physical_address) {
 // 检查虚拟页面是否已分配的辅助函数
 bool is_virtual_page_allocated(Process *process, addr_t address,size_t l1_index,size_t l2_index) {
   // 检查L1页表项是否有效
+  if(address){
+
+  }
   if (!process->page_table.entries[l1_index].entries) {
     return false;  // 如果L1页表项无效，返回false
   }
@@ -143,7 +146,15 @@ status_t read_byte(Process *process, addr_t address, byte_t *byte) {
   //   *byte = main_memory->pages[ppn]->data[address & ((1 << OFFSET_BITS) - 1)];
   //   return TLB_HIT;
   // } 
-  // else {
+  // else {if(!process){
+
+  
+  if(!address){
+
+  }
+  if(!byte){
+    
+  }
   //   // TLB未命中，需要从页表中获取物理页号
   //   // TLB未命中，需要从页表中获取物理页号
   //   unsigned l1_index = address >> (OFFSET_BITS + L2_BITS);

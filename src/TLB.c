@@ -33,6 +33,9 @@ unsigned read_TLB(proc_id_t pid, unsigned vpn) {
 
 
 void write_TLB(proc_id_t pid, unsigned vpn, unsigned ppn) {
+  if(pid){
+    
+  }
   int lru_index = -1;
   uint32_t min_lut = UINT32_MAX;
 
