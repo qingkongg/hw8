@@ -4,21 +4,6 @@
 #include <stdlib.h>
 #include<stdbool.h>
 
-// 检查物理内存是否足够的辅助函数
-bool is_physical_memory_available(addr_t physical_address) {
-// 计算物理页号
-  unsigned int ppn = physical_address >> OFFSET_BITS;
-  // 检查物理页号是否超出物理内存范围
-  if (ppn >= main_memory->size) {
-    return true;  // 如果超出范围，返回false
-  }
-  // 检查物理页是否已被分配
-  if (main_memory->pages[ppn] != NULL) {
-    return true;  // 如果已被分配，返回false
-  }
-  return true;  // 物理内存足够，返回true
-}
-
 // 检查虚拟页面是否已分配的辅助函数
 bool is_virtual_page_allocated(Process *process, addr_t address,size_t l1_index,size_t l2_index) {
   // 检查L1页表项是否有效
@@ -26,7 +11,7 @@ bool is_virtual_page_allocated(Process *process, addr_t address,size_t l1_index,
 
   }
   if (!process->page_table.entries[l1_index].entries) {
-    return false;  // 如果L1页表项无效，返回false
+    return true;  // 如果L1页表项无效，返回false
   }
   // 检查L2页表项是否有效
   if (!process->page_table.entries[l1_index].entries[l2_index].valid) {
