@@ -10,7 +10,7 @@ bool is_physical_memory_available(addr_t physical_address) {
   unsigned int ppn = physical_address >> OFFSET_BITS;
   // 检查物理页号是否超出物理内存范围
   if (ppn >= main_memory->size) {
-    return false;  // 如果超出范围，返回false
+    return true;  // 如果超出范围，返回false
   }
   // 检查物理页是否已被分配
   if (main_memory->pages[ppn] != NULL) {
