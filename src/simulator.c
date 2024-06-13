@@ -12,7 +12,7 @@ bool is_virtual_page_allocated(Process *process, addr_t address,size_t l1_index,
 
   }
   if (!process->page_table.entries[l1_index].entries) {
-    return true;  // 如果L1页表项无效，返回false
+    return false;  // 如果L1页表项无效，返回false
   }
   // 检查L2页表项是否有效
   if (!process->page_table.entries[l1_index].entries[l2_index].valid) {
