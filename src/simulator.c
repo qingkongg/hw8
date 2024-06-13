@@ -6,55 +6,54 @@
 
 
 // 检查虚拟页面是否已分配的辅助函数
-bool is_virtual_page_allocated(Process *process, addr_t address,size_t l1_index,size_t l2_index) {
-  // 检查L1页表项是否有效
-  if(address){
-
-  }
-  if (!process->page_table.entries[l1_index].entries) {
-    return false;  // 如果L1页表项无效，返回false
-  }
-  // 检查L2页表项是否有效
-  if (!process->page_table.entries[l1_index].entries[l2_index].valid) {
-    return false;  // 如果L2页表项无效，返回false
-  }
-  return false;  // 虚拟页面已被分配，返回true
+bool is_virtual_page_allocated(Process *process, size_t l1_index, size_t l2_index) {
+    // 检查L1页表项是否有效
+    if (process->page_table.entries[l1_index].entries == NULL) {
+        return false;  // 如果L1页表项无效，返回false
+    }
+    // 检查L2页表项是否有效
+    if (!process->page_table.entries[l1_index].entries[l2_index].valid) {
+        return false;  // 如果L2页表项无效，返回false
+    }
+    return true;  // 虚拟页面已被分配，返回true
 }
+
 
 status_t allocate_page(Process *process, addr_t address, addr_t physical_address) {
-  // 确保地址对齐
-  assert(address >> OFFSET_BITS << OFFSET_BITS == address);
-  assert(physical_address >> OFFSET_BITS << OFFSET_BITS == physical_address);
+    // 确保地址对齐
+    assert((address >> OFFSET_BITS << OFFSET_BITS) == address);
+    assert((physical_address >> OFFSET_BITS << OFFSET_BITS) == physical_address);
 
-  // 检查进程是否有效
-  if (process == NULL) {
-    return ERROR;
-  }
-  size_t temp = address/PAGE_SIZE;
-  size_t l1_index= temp >> L2_BITS;
-  size_t l2_index = temp && ((1<<L2_BITS)-1);
-  // 检查物理内存是否足够
-  
-  // 检查虚拟页面是否已分配
-  if (is_virtual_page_allocated(process, address,l1_index,l2_index)) {
-    return ERROR; 
-  }
+    // 检查进程是否有效
+    if (process == NULL) {
+        return ERROR;
+    }
 
-  // 检查L1页表项是否存在
-  if (process->page_table.entries[l1_index].entries == NULL) {
-  // // 如果不存在，则分配L2页表
-    process->page_table.entries[l1_index].entries = (PTE*)calloc(L2_PAGE_TABLE_SIZE, sizeof(PTE));
-  }
+    // 计算L1和L2索引
+    size_t l1_index = (address >> (L2_BITS + OFFSET_BITS)) & ((1 << L1_BITS) - 1);
+    size_t l2_index = (address >> OFFSET_BITS) & ((1 << L2_BITS) - 1);
 
-  // 设置L2页表项
+    // 检查虚拟页面是否已分配
+    if (is_virtual_page_allocated(process, l1_index, l2_index)) {
+        return ERROR; 
+    }
 
-  process->page_table.entries[l1_index].entries[l2_index].frame = physical_address >> OFFSET_BITS;
-  process->page_table.entries[l1_index].entries[l2_index].valid = 1;
+    // 检查L1页表项是否存在
+    if (process->page_table.entries[l1_index].entries == NULL) {
+        // 如果不存在，则分配L2页表
+        process->page_table.entries[l1_index].entries = (PTE*)calloc(L2_PAGE_TABLE_SIZE, sizeof(PTE));
+        if (process->page_table.entries[l1_index].entries == NULL) {
+            return ERROR;  // 分配失败
+        }
+    }
 
-  // 更新物理内存状态
- 
-  return SUCCESS;  // 分配成功
+    // 设置L2页表项
+    process->page_table.entries[l1_index].entries[l2_index].frame = physical_address >> OFFSET_BITS;
+    process->page_table.entries[l1_index].entries[l2_index].valid = 1;
+
+    return SUCCESS;  // 分配成功
 }
+
 
 status_t deallocate_page(Process *process, addr_t address) {
   // 确保地址对齐
